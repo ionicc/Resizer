@@ -1,0 +1,1 @@
+imgExts = ['png','bmp', 'jpg']
