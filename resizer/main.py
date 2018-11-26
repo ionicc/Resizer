@@ -5,15 +5,13 @@ import utils.constants as constants
 import sys
 from winreg import *
 
-
-#Getting the user's default downloads folder
-with OpenKey(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders') as key:
-    Downloads = QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
+'''
 
 #Checking for the arguments to take for input, output and changes
 def args_check(args = None):
     if(args == None):
         return NO_ARG_ERROR
+'''
 
     parser = argparse.ArgumentParser(description="Resizer - A lightweight Image size and resolution resizer")
     parser.add_argument('--input-file', '-i',
@@ -51,7 +49,8 @@ def bulkChange(change_res, input_location = None, output_location = None):
         pass
     # If there is no output location, save images at the default downloads folder
     if output_location is None:
-        #Use Downloads variable
+        #Use the current working directory
+        Downloads = os.getcwd()
         
     else:
         Downloads = output_location
