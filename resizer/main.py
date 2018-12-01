@@ -10,7 +10,7 @@ from winreg import *
 with OpenKey(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders') as key:
     Downloads = QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
 '''
-
+current_directory = os.getcwd()
 #Checking for the arguments to take for input, output and changes
 def args_check(args = None):
     if(args == None):
@@ -39,12 +39,25 @@ def clear_screen():
     else:
         os.system('clear')
 
-def change_res(path, filename, output_location):
+def change_res(path, filename, output_location=None):
     filepath = os.path.join(path, filename)
     image = Image.open(filepath)
-    change_res_path = os.path.join(output_location, filename)
+    if output_location is None:
+        change_res_path = os.path.join(current_directory, filename)
+    else:
+        change_res_path = os.path.join(output_location, filename)
     new_image = image.resize(dimensions(image))
     new_image.save(change_res_path)
+
+def reduce_size(path, filename, output_location=None):
+    filepath = os.path.join(path, filename)
+    image = Image.open(filepath)
+    if output_location is None:
+        reduce_size_path = os.path.join(current_directory, filename)
+    else:
+        reduce_size_path = os.path.join(output_location, filename)
+    lower_res_image = image.save(reduce_size_path, optimize = True, quality = 85)
+
 
 def dimensions(resolution):
     dimensions = resolution.split('x')
@@ -53,8 +66,6 @@ def dimensions(resolution):
 
 #Bulkchange Function to change the sized of all the images in the folder
 def bulkChange(resolution, input_location, output_location=None):
-    width, height = dimensions(resolution)
-    #If there's no input location, ERROR
     imgExts = ['png','bmp','jpg']
     if input_location is None:
         print("Input Location can't be empty. Please try again.")
