@@ -23,8 +23,8 @@ def args_check(args = None):
                 help = "Path to the input folder")
     parser.add_argument('--change-resolution', '-cr',
                 help = 'Change the image/images to the specified resolution')
-    parser.add_argument('--decrease-size', '-dc',
-                help = 'Decrease the size of the image/images')
+    parser.add_argument('--reduce-size', '-rc',
+                help = 'Redure the size of the image/images')
     parser.add_argument('--output-file', '-o',
                 help = "Path to the output file")
     parser.add_argument('--output-folder', '-of',
@@ -39,24 +39,44 @@ def clear_screen():
     else:
         os.system('clear')
 
-def change_res(path, filename, output_location=None):
-    filepath = os.path.join(path, filename)
-    image = Image.open(filepath)
-    if output_location is None:
-        change_res_path = os.path.join(current_directory, filename)
+def change_res(path, filename, output_location=None, fullpath=None):
+    if fullpath is None:
+        filepath = os.path.join(path, filename)
+        image = Image.open(filepath)
+        if output_location is None:
+            change_res_path = os.path.join(current_directory, filename)
+        else:
+            change_res_path = os.path.join(output_location, filename)
+        new_image = image.resize(dimensions(image))
+        new_image.save(change_res_path)
     else:
-        change_res_path = os.path.join(output_location, filename)
-    new_image = image.resize(dimensions(image))
-    new_image.save(change_res_path)
+        filepath = fullpath
+        image = Image.open(filepath)
+        if output_location is None:
+            change_res_path = os.path.join(current_directory, filename)
+        else:
+            change_res_path = os.path.join(output_location, filename)
+        new_image = image.resize(dimensions(image))
+        new_image.save(change_res_path)
 
-def reduce_size(path, filename, output_location=None):
-    filepath = os.path.join(path, filename)
-    image = Image.open(filepath)
-    if output_location is None:
-        reduce_size_path = os.path.join(current_directory, filename)
+
+def reduce_size(path, filename, output_location=None, fullpath=None):
+    if fullpath is None:
+        filepath = os.path.join(path, filename)
+        image = Image.open(filepath)
+        if output_location is None:
+            reduce_size_path = os.path.join(current_directory, filename)
+        else:
+            reduce_size_path = os.path.join(output_location, filename)
+            image.save(reduce_size_path, optimize = True, quality = 85)
     else:
-        reduce_size_path = os.path.join(output_location, filename)
-    lower_res_image = image.save(reduce_size_path, optimize = True, quality = 85)
+        filepath = fullpath
+        image = Image.open(filepath)
+        if output_location is None:
+            reduce_size_path = os.path.join(filepath, filename)
+        else:
+            reduce_size_path = os.path.join(output_location, filename)
+            image.save(reduce_size_path, optimize = True, quality = 85)
 
 
 def dimensions(resolution):
@@ -65,7 +85,7 @@ def dimensions(resolution):
     return (width, hieght)
 
 #Bulkchange Function to change the sized of all the images in the folder
-def bulkChange(resolution, input_location, output_location=None):
+def bulkChange(resolution, change_type, input_location, output_location=None):
     imgExts = ['png','bmp','jpg']
     if input_location is None:
         print("Input Location can't be empty. Please try again.")
@@ -79,33 +99,49 @@ def bulkChange(resolution, input_location, output_location=None):
                     change_res(path, filename)
                 elif change_type is 'reduce_size':
                     reduce_size(path, filename)
-            
-
-
-    # If there is no output location, save images at the default downloads folder
-    if output_location is None:
-        #Use the current working directory
-        Downloads = os.getcwd()
         
-    else:
-        Downloads = output_location
-        #Download the resized images here
 
 
 
 def main():
     clear_screen()
 
-     input_f = args_check(sys.argv[1:]).input_file
+    # input_f = args_check(sys.argv[1:]).input_file
     # input_fld = args_check(sys.argv[1:]).input_folder
     # output_f = args_check(sys.argv[1:]).output_file
     # output_fld = args_check(sys.argv[1:]).output_folder
     # change_res = args_check(sys.argv[1:]).change_resolution
     # decrease = args_check(sys.argv[1:]).decrease_size
 
-    try:
-        if input_f:
+    if args_check(sys.argv[1:]).input_file:
+        input_f = args_check(sys.argv[1:]).input_file
 
+        if args_check(sys.argv[1:]).output_file:
+            output_f = args_check(sys.argv[1:]).output_file
+        else:
+            output_f = None
+
+        if args_check(sys.argv[1:]).change_resolution:
+            change_type = 'change_resolution'
+            change_res()
+
+        elif args_check(sys.argv[1:]).reduce_size:
+            change_type = 'reduce_size'
+
+    elif args_check(sys.argv[1:]).input_folder:
+        input_fld = args_check(sys.argv[1:]).input_folder
+        if args_check(sys.argv[1:]).change_resolution:
+            change_type = 'change_resolution'
+        elif args_check(sys.argv[1:]).reduce_size:
+            change_type = 'reduce_size'
+
+        if args_check(sys.argv[1:]).output_folder:
+            output_fld = args_check(sys.argv[1:]).output_folder
+        else:
+            output_fld = None     
+
+    else:
+        print("Please enter an Input file using --input or -i. You can even use an input folder using --input-folder or -if.")
 
     '''
     if(input_f is None):
