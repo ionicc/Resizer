@@ -14,7 +14,7 @@ with OpenKey(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explo
 #Checking for the arguments to take for input, output and changes
 def args_check(args = None):
     if(args == None):
-        return NO_ARG_ERROR
+        print("Arguments are reqiured for execution")
 
     parser = argparse.ArgumentParser(description="Resizer - A lightweight Image size and resolution resizer")
     parser.add_argument('--input-file', '-i',
@@ -39,17 +39,38 @@ def clear_screen():
     else:
         os.system('clear')
 
+def change_res(path, filename, output_location):
+    filepath = os.path.join(path, filename)
+    image = Image.open(filepath)
+    change_res_path = os.path.join(output_location, filename)
+    new_image = image.resize(dimensions(image))
+    new_image.save(change_res_path)
+
+def dimensions(resolution):
+    dimensions = resolution.split('x')
+    width, hieght = dimensions[0], dimensions[2]
+    return (width, hieght)
+
 #Bulkchange Function to change the sized of all the images in the folder
-def bulkChange(change_res, input_location = None, output_location = None):
-    dimentions = change_res.split('x')
-    #Set width and height of the image
-    width, height = dimentions[0], dimentions[1]
-    
+def bulkChange(resolution, input_location, output_location=None):
+    width, height = dimensions(resolution)
     #If there's no input location, ERROR
+    imgExts = ['png','bmp','jpg']
     if input_location is None:
         print("Input Location can't be empty. Please try again.")
     else:
-        pass
+        for path, dirs, files in os.walk(input_location):
+            for filename in files:
+                ext = filename[-3:].lower()
+                if ext not in imgExts:
+                    continue
+                if change_type is 'change_resolution':
+                    change_res(path, filename)
+                elif change_type is 'reduce_size':
+                    reduce_size(path, filename)
+            
+
+
     # If there is no output location, save images at the default downloads folder
     if output_location is None:
         #Use the current working directory
@@ -64,13 +85,18 @@ def bulkChange(change_res, input_location = None, output_location = None):
 def main():
     clear_screen()
 
-    input_f = args_check(sys.argv[1:]).input_file
-    input_fld = args_check(sys.argv[1:]).input_folder
-    output_f = args_check(sys.argv[1:]).output_file
-    output_fld = args_check(sys.argv[1:]).output_folder
-    change_res = args_check(sys.argv[1:]).change_resolution
-    decrease = args_check(sys.argv[1:]).decrease_size
+     input_f = args_check(sys.argv[1:]).input_file
+    # input_fld = args_check(sys.argv[1:]).input_folder
+    # output_f = args_check(sys.argv[1:]).output_file
+    # output_fld = args_check(sys.argv[1:]).output_folder
+    # change_res = args_check(sys.argv[1:]).change_resolution
+    # decrease = args_check(sys.argv[1:]).decrease_size
 
+    try:
+        if input_f:
+
+
+    '''
     if(input_f is None):
         if(input_fld is None):
             print("Please enter either the Input file or the folder using --input-file or --input-folder")
@@ -78,3 +104,4 @@ def main():
         else:
             if change_res is not None:
                 bulkChange()
+    '''
