@@ -41,13 +41,14 @@ def change_res(resolution, path=None, filename=None, output_location=None, fullp
     if fullpath is None:
         filepath = os.path.join(path, filename)
         filename = os.path.basename(filepath)
-        print(filename)
+        print(filepath)
+        print(output_location)
         image = Image.open(filepath)
         if output_location is None:
             change_res_path = os.path.join(current_directory, filename)
         else:
             change_res_path = os.path.join(output_location, filename)
-        new_image = image.resize(dimensions(image))
+        new_image = image.resize(dimensions(resolution))
         new_image.save(change_res_path)
     else:
         filepath = fullpath
@@ -56,6 +57,7 @@ def change_res(resolution, path=None, filename=None, output_location=None, fullp
             change_res_path = os.path.join(current_directory, filename)
         else:
             change_res_path = os.path.join(output_location, filename)
+        
         new_image = image.resize(dimensions(image))
         new_image.save(change_res_path)
 
@@ -67,39 +69,40 @@ def reduce_size(path=None, filename=None, output_location=None, fullpath=None):
         if output_location is None:
             reduce_size_path = os.path.join(current_directory, filename)
         else:
-            reduce_size_path = os.path.join(output_location, filename)
-            image.save(reduce_size_path, optimize = True, quality = 85)
+            reduce_size_path = os.path.join(output_location, filename)  
     else:
         filepath = fullpath
         filename = os.path.basename(fullpath)
         image = Image.open(filepath)
         if output_location is None:
-            reduce_size_path = os.path.join(filepath, filename)
+            reduce_size_path = os.path.join(current_directory, filename)
         else:
             reduce_size_path = os.path.join(output_location,filename)
-            image.save(reduce_size_path, optimize = True, quality = 85)
+    image.save(reduce_size_path, optimize = True, quality = 85)
 
 
 def dimensions(resolution):
     dimensions = resolution.split('x')
-    width, hieght = dimensions[0], dimensions[2]
+    print(dimensions)
+    width, hieght = int(dimensions[0]), int(dimensions[1])
     return (width, hieght)
 
 #Bulkchange Function to change the sized of all the images in the folder
-def bulkChange(change_type, input_location, output_location=None, resolution=None):
+def bulkChange(change_type, input_location, output_folder=None, resolution=None):
     imgExts = ['png','bmp','jpg']
     if input_location is None:
         print("Input Location can't be empty. Please try again.")
     else:
         for path, dirs, files in os.walk(input_location):
-            for filename in files:
-                ext = filename[-3:].lower()
+            for fn in files:
+                print(path, fn)
+                ext = fn[-3:].lower()
                 if ext not in imgExts:
                     continue
                 if change_type is 'change_resolution':
-                    change_res(path, filename)
+                    change_res(resolution, path, fn, output_location=output_folder)
                 elif change_type is 'reduce_size':
-                    reduce_size(path, filename)
+                    reduce_size(path, fn, output_location=output_folder)
         
 
 
@@ -113,7 +116,6 @@ def main():
     # output_fld = args_check(sys.argv[1:]).output_folder
     # change_res = args_check(sys.argv[1:]).change_resolution
     # decrease = args_check(sys.argv[1:]).decrease_size
-
     if args_check(sys.argv[1:]).input_file:
         
         input_f = args_check(sys.argv[1:]).input_file
@@ -128,7 +130,7 @@ def main():
         if args_check(sys.argv[1:]).change_resolution:
             print(args_check(sys.argv[1:]).change_resolution)
             change_type = 'change_resolution'
-            change_res(args_check(sys.argv[1:]).change_resolution,fullpath=input_f, output_location=output_f)
+            change_res(args_check(sys.argv[1:]).change_resolution,fullpath=input_f, output_folder=output_f)
 
         elif args_check(sys.argv[1:]).reduce_size:
             print(args_check(sys.argv[1:]).reduce_size)
@@ -142,16 +144,17 @@ def main():
         input_fld = args_check(sys.argv[1:]).input_folder
         
         if args_check(sys.argv[1:]).output_folder:
+            print(args_check(sys.argv[1:]).output_folder)
             output_fld = args_check(sys.argv[1:]).output_folder
         else:
             output_fld = None     
 
         if args_check(sys.argv[1:]).change_resolution:
             change_type = 'change_resolution'
-            bulkChange(change_type, input_fld, output_fld, args_check(sys.argv[1:]).change_resolution,)
+            bulkChange(change_type, input_fld, output_folder=output_fld, resolution=args_check(sys.argv[1:]).change_resolution)
         elif args_check(sys.argv[1:]).reduce_size:
             change_type = 'reduce_size'
-            bulkChange(change_type, input_fld, output_fld)
+            bulkChange(change_type, input_fld, output_folder=output_fld)
 
     else:
         print("Please enter an Input file using --input or -i. You can even use an input folder using --input-folder or -if.")
