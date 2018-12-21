@@ -2,6 +2,8 @@ from PIL import Image
 import argparse
 import os
 import sys
+from os import listdir
+from os.path import splitext
 
 
 current_directory = os.getcwd()
@@ -20,6 +22,8 @@ def args_check(args = None):
                 help = 'Change the image/images to the specified resolution')
     parser.add_argument('--reduce', '-rs',
                 help = 'Reduce the size of the image/images', action='store_true')
+    parser.add_argument('--type', '-ty',
+                help = 'change the type of the image/images', action='store_true')
     parser.add_argument('--output-file', '-o',
                 help = "Path to the output file")
     parser.add_argument('--output-folder', '-of',
@@ -58,7 +62,39 @@ def change_res(resolution, path=None, filename=None, output_location=None, fullp
         new_image = image.resize(dimensions(resolution))
         new_image.save(change_res_path)
         print("Image saved at = " + change_res_path)
+        
+        
+#changing the image type      
+def img_type(file_type, path=None, filename=None, output_location=None, fullpath=None):
 
+    target = '.'+file_type
+    name, extension = os.path.splitext(filename)
+    
+    if fullpath is None:
+        filepath = os.path.join(path, filename)
+        print(filepath)
+        print(output_location)
+        image = Image.open(filepath)
+        if output_location is None:
+            change_type_path = os.path.join(current_directory, filename)
+        else:
+            change_type_path = os.path.join(output_location, filename)
+        new_img = image.open(filename)
+        new_img.save(name+'.'+target)
+        print("Image saved at = " + change_type_path)
+        
+    else:
+        filepath = fullpath
+        filename = os.path.basename(filepath)
+        image = Image.open(filepath)
+        if output_location is None:
+            change_type_path = os.path.join(current_directory, filename)
+        else:
+            change_type_path = os.path.join(output_location, filename)
+        new_img = image.open(filename)
+        new_img.save(name+'.'+target)
+        print("Image saved at = " + change_type_path)
+    
 def reduce_size(path=None, filename=None, output_location=None, fullpath=None):
     if fullpath is None:
         filepath = os.path.join(path, filename)
@@ -76,7 +112,7 @@ def reduce_size(path=None, filename=None, output_location=None, fullpath=None):
         else:
             reduce_size_path = os.path.join(output_location,filename)
     image.save(reduce_size_path, optimize = True, quality = 85)
-    print("Image saved at = " + change_res_path)
+    print("Image saved at = " + change_type_path)
 
 
 def dimensions(resolution):
@@ -88,6 +124,7 @@ def dimensions(resolution):
 
 def bulkChange(change_type, input_location, output_folder=None, resolution=None):
     imgExts = ['png','bmp','jpg']
+       
     if input_location is None:
         print("Input Location can't be empty. Please try again.")
     else:
@@ -101,7 +138,7 @@ def bulkChange(change_type, input_location, output_folder=None, resolution=None)
                     change_res(resolution, path, fn, output_location=output_folder)
                 elif change_type is 'reduce_size':
                     reduce_size(path, fn, output_location=output_folder)
-
+           
 def main():
     clear_screen()
     if args_check(sys.argv[1:]).input_file:
@@ -125,6 +162,10 @@ def main():
 
         else:
             print("Please specify the --change-resolution or the --reduce-size arguments")
+        #image type change
+        if args_check(sys.argv[1:]).type:
+            change_type = 'image_type'
+            img_type(args_check(sys.argv[1:]).type,fullpath=input_f, output_location=output_f)
 
     elif args_check(sys.argv[1:]).input_folder:
         input_fld = args_check(sys.argv[1:]).input_folder
@@ -141,9 +182,18 @@ def main():
         elif args_check(sys.argv[1:]).reduce:
             change_type = 'reduce_size'
             bulkChange(change_type, input_fld, output_folder=output_fld)
+        #image type change
+        if args_check(sys.argv[1:]).type:
+            change_type = 'image_type'
+            img_type(args_check(sys.argv[1:]).type,fullpath=input_f, output_location=output_f)
 
     else:
         print("Please enter an Input file using --input or -i. You can even use an input folder using --input-folder or -if.")
 
 if __name__ == '__main__':
     main()
+    
+    
+    
+    
+
