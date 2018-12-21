@@ -1,1 +1,0 @@
-imgExts = ['png','bmp', 'jpg']
