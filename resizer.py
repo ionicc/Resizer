@@ -2,9 +2,6 @@ from PIL import Image
 import argparse
 import os
 import sys
-from os import listdir
-from os.path import splitext
-
 
 current_directory = os.getcwd()
 
