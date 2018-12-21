@@ -112,7 +112,7 @@ def reduce_size(path=None, filename=None, output_location=None, fullpath=None):
         else:
             reduce_size_path = os.path.join(output_location,filename)
     image.save(reduce_size_path, optimize = True, quality = 85)
-    print("Image saved at = " + change_type_path)
+    print("Image saved at = " + change_res_path)
 
 
 def dimensions(resolution):
